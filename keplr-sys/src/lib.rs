@@ -1,13 +1,9 @@
 use js_sys::{JsString, Uint8Array};
-use std::str::FromStr;
 use wasm_bindgen::prelude::*;
-
-// TODO: implement signer traits for KeplrOfflineSigner
-// TODO: implement encryption utils trait for EnigmaUtils
 
 #[wasm_bindgen(js_namespace = ["window", "keplr"])]
 extern "C" {
-    #[wasm_bindgen(js_namespace = window, js_name = keplr)]
+    #[wasm_bindgen(thread_local, js_namespace = window, js_name = keplr)]
     pub static KEPLR: JsValue;
 
     pub type KeplrOfflineSigner;
@@ -113,99 +109,9 @@ extern "C" {
     #[wasm_bindgen(catch, js_name = suggestToken)]
     pub async fn suggest_token(chainId: &str, contract_address: &str) -> Result<(), JsValue>;
 
-    #[wasm_bindgen(js_name = getSecret20ViewingKey)]
-    pub async fn get_secret_20_viewing_key(chain_id: &str, contract_address: &str) -> JsValue;
+    #[wasm_bindgen(catch, js_name = getSecret20ViewingKey)]
+    pub async fn get_secret_20_viewing_key(
+        chain_id: &str,
+        contract_address: &str,
+    ) -> Result<JsValue, JsValue>;
 }
-
-// TODO: this part belongs not in this crate?
-
-pub struct EnigmaUtils {
-    pub inner: JsEnigmaUtils,
-}
-
-impl EnigmaUtils {
-    pub fn new(enigma_utils: JsEnigmaUtils) -> Self {
-        Self {
-            inner: enigma_utils,
-        }
-    }
-
-    /// Decrypt using Keplr.
-    pub async fn decrypt(&self, ciphertext: &[u8], nonce: &[u8]) -> Result<Uint8Array, JsValue> {
-        let nonce = Uint8Array::new(&serde_wasm_bindgen::to_value(nonce)?);
-        let ciphertext = Uint8Array::new(&serde_wasm_bindgen::to_value(ciphertext)?);
-        let plaintext = self.inner.decrypt(ciphertext, nonce).await;
-        let plaintext = Uint8Array::from(plaintext);
-
-        // TODO: maybe use this for debug print
-        // let decoder = web_sys::TextDecoder::new_with_label("utf-8")?;
-        // console::log_1(
-        //     &decoder
-        //         .decode_with_buffer_source(&plaintext.clone().into())?
-        //         .into(),
-        // );
-
-        Ok(plaintext.into())
-    }
-
-    /// Encrypt using Keplr.
-    pub async fn encrypt<M: serde::Serialize>(
-        &self,
-        contract_code_hash: String,
-        msg: &M,
-    ) -> Result<Uint8Array, JsValue> {
-        let contract_code_hash = JsString::from_str(&contract_code_hash).unwrap();
-        let msg = serde_wasm_bindgen::to_value(msg)?;
-        let result = self.inner.encrypt(contract_code_hash, msg).await;
-        Ok(result.into())
-    }
-
-    pub async fn get_pubkey(&self) -> Result<Uint8Array, JsValue> {
-        let pubkey = self.inner.get_pubkey().await;
-        Ok(pubkey.into())
-    }
-
-    pub async fn get_tx_encryption_key(&self, nonce: &[u8; 32]) -> Result<Uint8Array, JsValue> {
-        let nonce = Uint8Array::from(serde_wasm_bindgen::to_value(nonce)?);
-        let key = self.inner.get_tx_encryption_key(nonce).await;
-        Ok(key.into())
-    }
-}
-
-// use async_trait::async_trait;
-//
-// #[async_trait(?Send)]
-// pub trait Enigma {
-//     async fn encrypt<M: ::serde::Serialize>(
-//         &self,
-//         contract_code_hash: &str,
-//         msg: &M,
-//     ) -> Result<Uint8Array, JsValue>;
-//
-//     async fn decrypt(&self, ciphertext: &[u8], nonce: &[u8; 32]) -> Result<Uint8Array, JsValue>;
-// }
-//
-// // NOTE:
-// // Encryption and decryption can be more efficient if we get the tx_encryption_key once at the start, then
-// // reuse it for each individual encryption/decryption call.
-// // But then the WASM binary size increases if we bring in all the crypto stuff...
-// // But I think we need that stuff anyway for the default implementation...
-//
-// #[async_trait(?Send)]
-// impl Enigma for EnigmaUtils {
-//     async fn encrypt<M: ::serde::Serialize>(
-//         &self,
-//         code_hash: &str,
-//         msg: &M,
-//     ) -> Result<Uint8Array, JsValue> {
-//         let code_hash = JsString::from_str(code_hash).unwrap();
-//         let msg = serde_wasm_bindgen::to_value(msg)?;
-//
-//         self.encrypt_js(code_hash, msg.into()).await
-//     }
-//
-//     async fn decrypt(&self, ciphertext: &[u8], nonce: &[u8; 32]) -> Result<Uint8Array, JsValue> {
-//         self.decrypt_js(ciphertext.into(), nonce.as_slice().into())
-//             .await
-//     }
-// }

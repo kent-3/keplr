@@ -1,0 +1,12 @@
+[package]
+name = "keplr-sys"
+version = "0.1.0"
+edition = "2021"
+
+[lib]
+crate-type = ["cdylib", "rlib"]
+
+[dependencies]
+js-sys = "0.3.70"
+wasm-bindgen = "0.2.93"
+wasm-bindgen-futures = "0.4.43"

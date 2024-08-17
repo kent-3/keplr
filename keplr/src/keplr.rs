@@ -1,8 +1,6 @@
-pub use crate::keplr_sys;
-use crate::keplr_sys::*;
 use js_sys::{Error, JsString};
+use keplr_sys::*;
 use serde::{Deserialize, Serialize};
-use wasm_bindgen::prelude::*;
 use web_sys::console;
 
 /// An Amino encoded message.
@@ -63,7 +61,7 @@ pub struct StdFee {
 pub type Coin = String;
 
 use base64::prelude::{Engine as _, BASE64_STANDARD};
-#[derive(Serialize, Deserialize, Clone, Default)]
+#[derive(Serialize, Deserialize, Clone, Default, PartialEq)]
 #[serde(rename_all = "camelCase")]
 pub struct KeyInfo {
     pub name: String,
@@ -90,7 +88,7 @@ pub struct Keplr {}
 // TODO: return Errors instead of Strings?
 impl Keplr {
     pub fn debug() {
-        console::log_1(&KEPLR.clone())
+        KEPLR.with(|js_value| console::log_1(js_value))
     }
 
     // TODO: use a Vec of chain_ids to enable multiple chains at once
@@ -141,8 +139,20 @@ impl Keplr {
     //     EnigmaUtils::new(get_enigma_utils(chain_id))
     // }
 
-    pub async fn get_secret_20_viewing_key(chain_id: &str, contract_address: &str) -> String {
-        JsString::from(get_secret_20_viewing_key(chain_id, contract_address).await).into()
+    pub async fn get_secret_20_viewing_key(
+        chain_id: &str,
+        contract_address: &str,
+    ) -> Result<String, String> {
+        get_secret_20_viewing_key(chain_id, contract_address)
+            .await
+            .map_err(|js_value| {
+                let error = Error::from(js_value)
+                    .message()
+                    .as_string()
+                    .unwrap_or("viewing key error".to_string());
+                error
+            })
+            .map(|foo| JsString::from(foo).into())
     }
 
     pub fn disable(chain_id: &str) {
@@ -151,12 +161,6 @@ impl Keplr {
 
     pub fn disable_all_chains() {
         disable_origin()
-    }
-}
-
-impl KeplrOfflineSigner {
-    pub async fn sign(&self) -> Result<JsValue, JsValue> {
-        todo!()
     }
 }
 
