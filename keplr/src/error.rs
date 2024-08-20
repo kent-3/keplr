@@ -1,21 +1,27 @@
-#[derive(thiserror::Error, Debug)]
+#[derive(thiserror::Error, serde::Serialize, serde::Deserialize, Debug, Clone, PartialEq)]
 pub enum Error {
-    #[error("JavaScript Error: {0}")]
-    JsError(String),
+    #[error("An error occurred in JavaScript: {0}")]
+    JavaScript(String),
 
     #[error("Serialization Error: {0}")]
-    SerializationError(#[from] serde_wasm_bindgen::Error),
+    Serialization(String),
 
-    #[error("Unknown Error")]
-    Unknown,
+    #[error("Keplr is unavailable!")]
+    KeplrUnavailable,
 }
 
-impl From<js_sys::Error> for Error {
-    fn from(error: js_sys::Error) -> Self {
-        let message = error
+impl From<web_sys::wasm_bindgen::JsValue> for Error {
+    fn from(error: web_sys::wasm_bindgen::JsValue) -> Self {
+        let message = web_sys::js_sys::Error::from(error)
             .message()
             .as_string()
             .unwrap_or("unknown JS error".to_string());
-        Error::JsError(message)
+        Error::JavaScript(message)
+    }
+}
+impl From<serde_wasm_bindgen::Error> for Error {
+    fn from(error: serde_wasm_bindgen::Error) -> Self {
+        let message = error.to_string();
+        Error::Serialization(message)
     }
 }
