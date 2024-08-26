@@ -4,6 +4,7 @@ version = "0.0.0"
 authors = ["Kent"]
 edition = "2021"
 description = "Bindings for Keplr wallet API"
+documentation = "https://docs.rs/keplr-sys"
 readme = "./README.md"
 repository = "https://github.com/kent-3/keplr/tree/main/keplr-sys"
 license = "Unlicense"

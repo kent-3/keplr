@@ -1,10 +1,3 @@
-//! keplr-sys provides...
-//!
-//!
-//! See https://docs.keplr.app/api/ and
-//! https://github.com/chainapsis/keplr-wallet/blob/master/packages/provider-extension/src/keplr.ts
-//! for more information.
-
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen(js_namespace = ["window", "keplr"])]
