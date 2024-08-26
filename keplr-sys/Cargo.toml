@@ -1,12 +1,13 @@
 [package]
 name = "keplr-sys"
-version = "0.1.0"
+version = "0.0.0"
+authors = ["Kent"]
 edition = "2021"
-
-[lib]
-crate-type = ["cdylib", "rlib"]
+description = "Bindings for Keplr wallet API"
+readme = "./README.md"
+repository = "https://github.com/kent-3/keplr/tree/main/keplr-sys"
+license = "Unlicense"
 
 [dependencies]
-js-sys = "0.3.70"
 wasm-bindgen = "0.2.93"
 wasm-bindgen-futures = "0.4.43"
