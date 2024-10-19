@@ -83,6 +83,12 @@ extern "C" {
     ) -> Result<JsValue, JsValue>; // DirectSignResponse
 }
 
+impl std::fmt::Debug for KeplrOfflineSigner {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "KeplrOfflineSigner: {:?}", self)
+    }
+}
+
 #[wasm_bindgen(js_namespace = ["window", "keplr"])]
 extern "C" {
     pub type KeplrOfflineSignerOnlyAmino;
@@ -101,6 +107,12 @@ extern "C" {
     ) -> Result<JsValue, JsValue>; // AminoSignResponse
 }
 
+impl std::fmt::Debug for KeplrOfflineSignerOnlyAmino {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "KeplrOfflineSignerOnlyAmino: {:?}", self)
+    }
+}
+
 #[wasm_bindgen(js_namespace = ["window", "keplr"])]
 extern "C" {
     pub type EnigmaUtils;
@@ -108,17 +120,31 @@ extern "C" {
     #[wasm_bindgen(method, js_name = chainId, getter)]
     pub fn chain_id(this: &EnigmaUtils) -> JsValue;
 
-    #[wasm_bindgen(method, js_name = decrypt)]
-    pub async fn decrypt(this: &EnigmaUtils, ciphertext: &[u8], nonce: &[u8]) -> JsValue;
+    #[wasm_bindgen(method, js_name = decrypt, catch)]
+    pub async fn decrypt(
+        this: &EnigmaUtils,
+        ciphertext: &[u8],
+        nonce: &[u8],
+    ) -> Result<JsValue, JsValue>;
 
-    #[wasm_bindgen(method, js_name = encrypt)]
-    pub async fn encrypt(this: &EnigmaUtils, contract_code_hash: String, msg: JsValue) -> JsValue;
+    #[wasm_bindgen(method, js_name = encrypt, catch)]
+    pub async fn encrypt(
+        this: &EnigmaUtils,
+        contract_code_hash: String,
+        msg: JsValue,
+    ) -> Result<JsValue, JsValue>;
 
     #[wasm_bindgen(method, js_name = getPubkey)]
     pub async fn get_pubkey(this: &EnigmaUtils) -> JsValue;
 
     #[wasm_bindgen(method, js_name = getTxEncryptionKey)]
     pub async fn get_tx_encryption_key(this: &EnigmaUtils, nonce: &[u8]) -> JsValue;
+}
+
+impl std::fmt::Debug for EnigmaUtils {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "EnigmaUtils: {:?}", self)
+    }
 }
 
 // NOTE: these seem to be equivalent to the EnigmaUtils methods, but may be more convenient

@@ -142,7 +142,7 @@ dependencies = [
  "async-trait",
  "base64",
  "futures",
- "keplr-sys 0.0.2 (registry+https://github.com/rust-lang/crates.io-index)",
+ "keplr-sys 0.0.2",
  "send_wrapper",
  "serde",
  "serde-wasm-bindgen",
@@ -154,6 +154,8 @@ dependencies = [
 [[package]]
 name = "keplr-sys"
 version = "0.0.2"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "6b97e0e3ca27ad2dcee24bfd2008e6ad7f837eddb318cd0ad271178fe9f841a0"
 dependencies = [
  "wasm-bindgen",
  "wasm-bindgen-futures",
@@ -161,9 +163,7 @@ dependencies = [
 
 [[package]]
 name = "keplr-sys"
-version = "0.0.2"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6b97e0e3ca27ad2dcee24bfd2008e6ad7f837eddb318cd0ad271178fe9f841a0"
+version = "0.0.3"
 dependencies = [
  "wasm-bindgen",
  "wasm-bindgen-futures",
