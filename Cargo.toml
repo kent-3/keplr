@@ -1,3 +1,10 @@
 [workspace]
 resolver = "2"
 members = ["keplr", "keplr-sys"]
+
+[patch.crates-io]
+secret-sdk-proto = { git = "https://github.com/kent-3/secret-rust", branch = "main" }
+secretrs = { git = "https://github.com/kent-3/secret-rust", branch = "main" }
+
+# [patch."https://github.com/kent-3/secret-clients.git"]
+# rsecret = { path = "../secret-clients/rsecret" }
